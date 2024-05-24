@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login / Sign Up</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background: #f7f7f7;
+    }
+    .container {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      width: 300px;
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 20px;
+      font-size: 24px;
+      color: #333;
+    }
+    label {
+      display: block;
+      text-align: left;
+      margin-bottom: 5px;
+      font-size: 14px;
+      color: #555;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 4px;
+      background-color: #007bff;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .toggle-button {
+      background: none;
+      color: #007bff;
+      text-decoration: underline;
+      cursor: pointer;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+    .toggle-button:hover {
+      color: white;
+      background-color: #0056b3;
+    }
+    .hidden {
+      display: none;
+    }
+    .form-container {
+      display: none;
+    }
+    .form-container.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div id="login-container" class="container form-container active">
+    <h1>Login</h1>
+    <form id="login-form">
+      <label for="login-username">Username:</label>
+      <input type="text" id="login-username" name="username" required>
+      <label for="login-password">Password:</label>
+      <input type="password" id="login-password" name="password" required>
+      <button type="submit">Login</button>
+    </form>
+    <button id="show-signup" class="toggle-button">Sign Up</button>
+  </div>
+
+  <div id="signup-container" class="container form-container">
+    <h1>Sign Up</h1>
+    <form id="signup-form">
+      <label for="signup-username">Username:</label>
+      <input type="text" id="signup-username" name="username" required>
+      <label for="signup-password">Password:</label>
+      <input type="password" id="signup-password" name="password" required>
+      <label for="signup-email">Email:</label>
+      <input type="email" id="signup-email" name="email" required>
+      <button type="submit">Sign Up</button>
+    </form>
+    <button id="show-login" class="toggle-button">Back to Login</button>
+  </div>
+
+  <script src="login.js"></script>
+</body>
+</html>

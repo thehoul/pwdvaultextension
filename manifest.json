@@ -1,0 +1,29 @@
+{
+    "manifest_version": 2,
+    "name": "Password Vault",
+    "version": "1.0",
+
+    "description": "This extension will help you to store your passwords securely",
+
+    "background": {
+        "scripts": ["background.js", "startup.js", "login.js"]
+    },
+
+    "permissions": [
+        "menus",
+        "storage",
+        "cookies",
+        "https://*/*",
+        "notifications"
+    ],
+
+    "browser_action": {
+        "default_icon": "icons/lock-24.svg",
+        "default_popup": "popup.html"
+    },
+    "web_accessible_resources": [
+        "popup.html"
+      ]
+
+
+}
