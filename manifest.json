@@ -13,8 +13,7 @@
         "menus",
         "storage",
         "cookies",
-        "https://*/*",
-        "notifications"
+        "https://*/*"
     ],
 
     "browser_action": {
