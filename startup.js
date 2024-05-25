@@ -1,26 +1,25 @@
+/**
+ * Check if the user is logged in by sending a message to the background script. 
+ * If not, open the login page in a new tab.
+ */
 async function onStartup(){
   console.log("Looking for session cookies");
-  try {
-    const resp = await fetch('https://pi.thehoul.ch/checkAuth', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      credentials: 'include'
-    });
 
-    if(resp.ok) {
-      browser.notifications.create("session-cookie", {
-        type: 'basic',
-        title: 'PasswordVault',
-        message: 'Session cookie not found, please login',
+  // Send a message to the background script to check if the user is logged in
+  browser.runtime.sendMessage({ action: 'checkAuth' }).then((response) => {
+    if (!response.success) {
+      browser.tabs.create({
+        url: browser.runtime.getURL('login.html')
+      }).catch((error) => {
+        console.error('Error opening popup:', error);
       });
     }
-  } catch (error) {
-    console.error('Error retrieving cookie:', error);
-  }
+  });
 }
 
+/**
+ * Open the login page in a new tab when the extension is installed.
+ */
 async function onInstalled(){
   browser.tabs.create({
     url: browser.runtime.getURL('login.html')
@@ -28,19 +27,6 @@ async function onInstalled(){
     console.error('Error opening popup:', error);
   });
 }
-
-browser.notifications.onClicked.addListener((notificationId) => {
-  if (notificationId === 'session-cookie') {
-    browser.tabs.create({
-      url: browser.runtime.getURL('login.html')
-    }).then(() => {
-      browser.notifications.clear(notificationId);
-    }).catch((error) => {
-      console.error('Error opening popup:', error);
-    });
-  }
-});
-
 
 browser.runtime.onStartup.addListener(onStartup);
 browser.runtime.onInstalled.addListener(onInstalled);

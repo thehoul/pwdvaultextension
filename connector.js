@@ -1,5 +1,16 @@
+const USER_URL = 'https://pi.thehoul.ch/user/';
+const CHECK_AUTH_URL = 'https://pi.thehoul.ch/checkAuth';
+const LOGOUT_URL = 'https://pi.thehoul.ch/logout';
+
+/**
+ * Login to the server with the given username and password
+ * @param {string} username 
+ * @param {string} password 
+ * @returns {Promise<{ success: boolean, message: string }>} success is true if login is successful, false otherwise. In both cases, the message 
+ * will contain the response message.
+ */
 function login(username, password) {
-    return fetch('https://pi.thehoul.ch/user/' + username, {
+    return fetch(USER_URL + username, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -18,8 +29,16 @@ function login(username, password) {
     });
 }
 
-function signup(username, password) {
-    return fetch('https://pi.thehoul.ch/user/' + username, {
+/**
+ * Create a login to the server with the given username, password and email
+ * @param {string} username 
+ * @param {string} password 
+ * @param {string} email
+ * @returns {Promise<{ success: boolean, message: string }>} success is true if login is successful, false otherwise. In both cases, the message 
+ * will contain the response message.
+ */
+function signup(username, password, email) {
+    return fetch(USER_URL + username, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -38,6 +57,49 @@ function signup(username, password) {
     });
 }
 
+/**
+ * 
+ * @returns {Promise<{ success: boolean, user: string }>} success is true if user is logged in, false otherwise.
+ *  In case of success, the user object will contain the username.
+ */
+function checkUserLoggedIn() {
+    return fetch(CHECK_AUTH_URL, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        credentials: 'include'
+    }).then((response) => {
+        return response.json().then((data) => {
+            return { success: response.ok, user: data.user };
+        });
+    }).catch((error) => {
+        return { success: false, message: error };
+    });
+}
+
+/**
+ * Logout the current user
+ * @returns {Promise<{ success: boolean, message: string }>} success is true if logout is successful, false otherwise. 
+ * In both cases, the message contains the response message.
+ */
+function logout() {
+    return fetch(LOGOUT_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        credentials: 'include'
+    }).then((response) => {
+        return response.json().then((data) => {
+            return { success: response.ok, message: data.msg };
+        });
+    }).catch((error) => {
+        return { success: false, message: error };
+    });
+
+}
+
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     switch (message.action) {
         case 'login':
@@ -45,6 +107,12 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
             break;
         case 'signup':
             sendResponse(signup(message.username, message.password));
+            break;
+        case 'checkAuth':
+            sendResponse(checkUserLoggedIn());
+            break;
+        case 'logout':
+            sendResponse(logout());
             break;
         default:
             sendResponse({ success: false, error: 'Invalid action' });
