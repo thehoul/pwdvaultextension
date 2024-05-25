@@ -1,53 +1,57 @@
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener('DOMContentLoaded', async () => {
+    const popupContent = document.getElementById('popup-content');
 
-    document.getElementById("set").addEventListener("click", (e) => {
-        console.log("Setting account");
-        // Save the account information in the session storage
-        username = document.getElementById("username").value;
-        password = document.getElementById("password").value;
+    const user = await checkUserLoggedIn();
 
-        console.log("Username: ", username);
-        console.log("Password; ", password);
+    if (user) {
+        // If user is logged in, show account info
+        popupContent.innerHTML = `
+        <div class="account-info">
+            <h2>Logged in as ${user.username}</h2>
+            <p>email: ${user.email}</p>
+        </div>
+        <button class="logout-button" id="logout-button">Logout</button>
+        <div id="logout-message" class="logout-message" style="display: none;">Logging you out...</div>`;
 
-        if(!saveToSessionStorage(username, password)) {
-            console.error("Error saving account information");
-        }
-    });
-
-    document.getElementById("create").addEventListener("click", (e) => {
-        username = document.getElementById("username").value;
-        password = document.getElementById("password").value;
-
-        const req = new Request("https://thehoul.ch/user/" + username , {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                "username": username,
-                "password": password
-            })
+        document.getElementById('logout-button').addEventListener('click', () => {
+            logoutUser();
         });
+    } else {
+        // If user is not logged in, show login button
+        popupContent.innerHTML = `
+        <h2>Not logged in.</h2>
+        <button class="button" id="login-button">Login</button>
+      `;
 
-        fetch(req).then((response) => {
-            console.log("Response: ", response);
-        }, (error) => {
-            console.error("Error creating account: ", error);
+        document.getElementById('login-button').addEventListener('click', () => {
+            browser.tabs.create({ url: 'login.html' });
         });
-        
-    });
-    
+    }
 });
 
-function saveToSessionStorage(username, password) {
-    browser.storage.local.set({
-        "username": username,
-        "password": password
-    }).then(() => {
-        console.log("Account information saved in session storage");
-        return true;
-    }, (error) => {
-        console.error("Error saving account information: ", error);
-        return false;
+// Simulate a function to check if the user is logged in
+function checkUserLoggedIn() {
+    return browser.runtime.sendMessage({ action: 'checkAuth' }).then((response) => {
+        if (response.success) {
+            return { username: response.user, email: "dummy@email.ch" };
+        }
+        return null;
+    });
+}
+
+// Simulate a function to log out the user
+function logoutUser() {
+    browser.runtime.sendMessage({ action: 'logout' }).then((response) => {
+        if (response.success) {
+            document.getElementById('logout-message').style.display = 'block';
+            setTimeout(() => {
+                location.reload();
+            }, 2000);
+        } else {
+            document.getElementById('logout-message').textContent = response.message;
+            setTimeout(() => {
+                location.reload();
+            }, 2000);
+        }
     });
 }
