@@ -49,6 +49,7 @@
       color: white;
       font-size: 16px;
       cursor: pointer;
+      transition: background-color 0.3s;
     }
     button:hover {
       background-color: #0056b3;
@@ -56,6 +57,7 @@
     .toggle-button {
       background: none;
       color: #007bff;
+      border: none;
       text-decoration: underline;
       cursor: pointer;
       font-size: 14px;
@@ -65,8 +67,18 @@
       color: white;
       background-color: #0056b3;
     }
-    .hidden {
+    .feedback {
+      border-radius: 4px;
+      padding: 10px;
       display: none;
+      margin-top: 10px;
+      font-size: 14px;
+      color: white;
+      background-color: red;
+    }
+    .feedback.success {
+      color: white;
+      background-color: green;
     }
     .form-container {
       display: none;
@@ -87,6 +99,7 @@
       <button type="submit">Login</button>
     </form>
     <button id="show-signup" class="toggle-button">Sign Up</button>
+    <div id="login-feedback" class="feedback"></div>
   </div>
 
   <div id="signup-container" class="container form-container">
@@ -101,6 +114,7 @@
       <button type="submit">Sign Up</button>
     </form>
     <button id="show-login" class="toggle-button">Back to Login</button>
+    <div id="signup-feedback" class="feedback"></div>
   </div>
 
   <script src="login.js"></script>
