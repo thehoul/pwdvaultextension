@@ -1,6 +1,7 @@
 const USER_URL = 'https://pi.thehoul.ch/user/';
 const CHECK_AUTH_URL = 'https://pi.thehoul.ch/checkAuth';
 const LOGOUT_URL = 'https://pi.thehoul.ch/logout';
+const PASSWORD_URL = 'https://pi.thehoul.ch/passwords/';
 
 /**
  * Login to the server with the given username and password
@@ -100,6 +101,22 @@ function logout() {
 
 }
 
+function getPassword(username, website) {
+    return fetch(PASSWORD_URL+username+'/'+website, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        credentials: 'include'
+    }).then((response) => {
+        return response.json().then((data) => {
+            return { success: response.ok, passwords: data.passwords };
+        });
+    }).catch((error) => {
+        return { success: false, message: error };
+    });
+}
+
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     switch (message.action) {
         case 'login':
@@ -113,6 +130,9 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
             break;
         case 'logout':
             sendResponse(logout());
+            break;
+        case 'getPasswords':
+            sendResponse(getPassword(message.username, message.website));
             break;
         default:
             sendResponse({ success: false, error: 'Invalid action' });
