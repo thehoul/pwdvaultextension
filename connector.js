@@ -117,6 +117,42 @@ function getPassword(username, website) {
     });
 }
 
+function addPassword(username, website, password) {
+    return fetch(PASSWORD_URL+username+'/'+website, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            "password": password
+        })
+    }).then((response) => {
+        return response.json().then((data) => {
+            return { success: response.ok, message: data.msg };
+        });
+    }).catch((error) => {
+        return { success: false, message: error };
+    });
+}
+
+function deletePassword(username, website, password) {
+    return fetch(PASSWORD_URL+username+'/'+website, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            "password": password
+        })
+    }).then((response) => {
+        return response.json().then((data) => {
+            return { success: response.ok, message: data.msg };
+        });
+    }).catch((error) => {
+        return { success: false, message: error };
+    });
+}
+
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     switch (message.action) {
         case 'login':
@@ -133,6 +169,9 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
             break;
         case 'getPasswords':
             sendResponse(getPassword(message.username, message.website));
+            break;
+        case 'addPassword':
+            sendResponse(addPassword(message.username, message.website, message.password));
             break;
         default:
             sendResponse({ success: false, error: 'Invalid action' });
