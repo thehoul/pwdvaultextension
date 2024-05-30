@@ -27,12 +27,11 @@ function createMenus(tab) {
                 });
                 for (let i = 0; i < response.passwords.length; i++) {
                     let pwd = response.passwords[i];
+                    pwds[i] = pwd;
                     browser.menus.create({
                         id: "vaultgetpwd" + i,
                         title: pwd,
                         contexts: ["password"]
-                    });
-                    browser.menus.onClicked.addListener((info, tab) => {
                     });
                 }
             } else {
@@ -47,6 +46,9 @@ function createMenus(tab) {
         });
     });   
 }
+
+const MAX_PASSWORDS = 10;
+let pwds = new Array(MAX_PASSWORDS);
 
 /**
  * Create the menu options for creating a new password
@@ -73,22 +75,31 @@ browser.menus.onClicked.addListener((info, tab) => {
         // Open the password generator page or a popup of something like that
         browser.browserAction.setPopup({ popup: "passwordgen.html" });
         browser.browserAction.openPopup();
-
-    } else if (info.menuItemId === "vaultgetpwd" + i) {
+    } else {
         // Only handle the 10 first passwords
-        for(let i = 0; i < 10; i++){
-            if(info.button == 0){ // left click
-                browser.tabs.sendMessage(tab.id, { action: "inject", password: pwd});
-            } else if(info.button == 2){ // right click
-                deletePassword("theo", base_url, pwd).then((response) => {
-                    // TODO: find a way to ask for confirmation first
-                    if (response.success) {
-                        createMenus(tab);
-                    } else {
-                        console.log('Failed to delete password: ' + response.message);
-                    }
-                });
-            }   
+        for(let i = 0; i < MAX_PASSWORDS; i++){
+            if (info.menuItemId === "vaultgetpwd" + i) {
+                let pwd = pwds[i];
+                let base_url = new URL(tab.url).hostname;
+
+
+                if(info.button == 0){ // left click
+                    browser.tabs.sendMessage(tab.id, { action: "inject", password: pwd});
+                } else if(info.button == 2){ // right click
+                    // Ask to confirm first
+                    browser.tabs.sendMessage(tab.id, { action: "confirm", message: "Are you sure you want to delete this password?"}).then((response) => {
+                        if(response.success){
+                            deletePassword("theo", base_url, pwd).then((response) => {
+                                if (response.success) {
+                                    createMenus(tab);
+                                } else {
+                                    console.log('Failed to delete password: ' + response.message);
+                                }
+                            });
+                        }
+                    });
+                }   
+            }
         }
     }
 });
@@ -103,5 +114,20 @@ browser.tabs.onActivated.addListener((activeInfo) => {
 browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     if (changeInfo.status === "complete") {
         createMenus(tab);
+    }
+});
+
+browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    switch(message.action) {
+        case 'menuAddPassword':
+            sendResponse(addPassword(message.username, message.website, message.password).then((response) => {
+                browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
+                    browser.tabs.sendMessage(tabs[0].id, { action: "inject", password: message.password });
+                    createMenus(tabs[0]);
+                });
+                return response;
+            }));
+
+            break;
     }
 });

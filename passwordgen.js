@@ -46,17 +46,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const password = passwordField.value;
 
         if (url) {
-            browser.runtime.sendMessage({ action: 'addPassword', username: 'theo',
-                website: url, password: password }).then((response) => {
+            browser.runtime.sendMessage({ action: 'menuAddPassword', username: 'theo', 
+                                        website: url, password: password }).then((response) => {
+                console.log(response);
                 if (response.success) {
-                    browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
-                        browser.tabs.sendMessage(tabs[0].id, { action: 'inject', password: password });
-                    });
-                    // close
+                    // Close the popup
+                    document.getElementById('error-message').style.display = 'none';
                     window.close();
-                    
                 } else {
-                    alert('Failed to save password: ' + response.message);
+                    document.getElementById('error-message').textContent = "Error: "; + response.message;
                 }
             });
         } else {
