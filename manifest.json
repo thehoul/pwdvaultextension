@@ -25,6 +25,12 @@
         }
     ],
 
+    "icons" : {
+        "16": "icons/lock-24.svg",
+        "48": "icons/lock-24.svg",
+        "128": "icons/lock-24.svg"
+    },
+
     "browser_action": {
         "default_icon": "icons/lock-24.svg",
         "default_popup": "popup.html"
