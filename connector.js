@@ -174,6 +174,6 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
             sendResponse(addPassword(message.username, message.website, message.password));
             break;
         default:
-            sendResponse({ success: false, error: 'Invalid action' });
+            break;
     }
 });
