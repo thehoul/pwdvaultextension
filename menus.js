@@ -5,8 +5,8 @@
  */
 function createMenus(tab) {
     browser.menus.removeAll().then(() => {
-            let base_url;
-            try {
+        let base_url;
+        try {
             base_url = new URL(tab.url).hostname;
         } catch (e) {
             browser.menus.create({
@@ -17,38 +17,54 @@ function createMenus(tab) {
             });
             return;
         }
-        getPassword("theo", base_url).then((response) => {
-            if (response.success) {
-                browser.menus.create({
-                    id: "passwords",
-                    title: "Passwords for " + base_url + ":",
-                    type: "normal",
-                    contexts: ["password"]
+
+        checkUserLoggedIn().then((response) => {
+            if(response.success){
+                getPassword("theo", base_url).then((response) => {
+                    if (response.success) {
+                        browser.menus.create({
+                            id: "passwords",
+                            title: "Passwords for " + base_url + ":",
+                            type: "normal",
+                            contexts: ["password"]
+                        });
+                        for (let i = 0; i < response.passwords.length; i++) {
+                            let pwd = response.passwords[i];
+                            pwds[i] = pwd;
+                            browser.menus.create({
+                                id: "vaultgetpwd" + i,
+                                title: pwd,
+                                contexts: ["password"]
+                            });
+                        }
+                    } else {
+                        browser.menus.create({
+                            id: "passwords",
+                            title: "No passwords for " + base_url,
+                            type: "normal",
+                            contexts: ["password"]
+                        })
+                    }
+                    createPasswordMenu();
                 });
-                for (let i = 0; i < response.passwords.length; i++) {
-                    let pwd = response.passwords[i];
-                    pwds[i] = pwd;
-                    browser.menus.create({
-                        id: "vaultgetpwd" + i,
-                        title: pwd,
-                        contexts: ["password"]
-                    });
-                }
             } else {
-                browser.menus.create({
-                    id: "passwords",
-                    title: "No passwords for " + base_url,
-                    type: "normal",
-                    contexts: ["password"]
-                })
+                createNotAuthMenu();
             }
-            createPasswordMenu();
         });
     });   
 }
 
 const MAX_PASSWORDS = 10;
 let pwds = new Array(MAX_PASSWORDS);
+
+function createNotAuthMenu(){
+    browser.menus.create({
+        id: "notauth",
+        title: "Not logged in. Click to log in",
+        type: "normal",
+        contexts: ["password"]
+    });
+}
 
 /**
  * Create the menu options for creating a new password
@@ -75,6 +91,9 @@ browser.menus.onClicked.addListener((info, tab) => {
         // Open the password generator page or a popup of something like that
         browser.browserAction.setPopup({ popup: "passwordgen.html" });
         browser.browserAction.openPopup();
+    } else if(info.menuItemId === "notauth"){ 
+        // Open the login page
+        browser.tabs.create({ url: "login.html" });
     } else {
         // Only handle the 10 first passwords
         for(let i = 0; i < MAX_PASSWORDS; i++){
