@@ -31,3 +31,13 @@ Then, it could have
 3. A button to logout
 
 **Status**: not started. the server doesn't yet register email addresses and thus doesn't handle modifiying the password. Also, manage the password for any website might be complicated (?), it requires fetching all available passwords and display them in an html menu.
+
+
+
+# Next
+
+- Add stuff in the popup (gen password, manage passwords)
+- Solve concurrency problem (lock or sqlite or ??)
+- Add email in accounts for account registration verification and password reset
+- Better icons ?
+- Make only one password per page?
