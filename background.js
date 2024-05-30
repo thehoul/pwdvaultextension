@@ -57,9 +57,17 @@ function createPasswordMenu() {
     
 }
 
+browser.runtime.onMessage.addListener((message) => {    
+    if (message.action === "closePopup") {
+        browser.browserAction.setPopup({ popup: "popup.html" });
+    }
+});
+
 browser.menus.onClicked.addListener((info, tab) => {
     if (info.menuItemId === "vaultcreatepwd") {
         // Open the password generator page or a popup of something like that
+        browser.browserAction.setPopup({ popup: "passwordgen.html" });
+        browser.browserAction.openPopup();
 
     } else if (info.menuItemId === "vaultgetpwd" + i) {
         for(let i = 0; i < 10; i++){

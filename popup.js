@@ -55,3 +55,8 @@ function logoutUser() {
         }
     });
 }
+
+window.addEventListener('unload', () => {
+    // Notify the background script that the popup is closed
+    browser.runtime.sendMessage({ action: 'closePopup' });
+});

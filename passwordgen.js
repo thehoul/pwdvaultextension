@@ -23,6 +23,11 @@ document.addEventListener('DOMContentLoaded', () => {
         passwordField.value = newPassword;
     }
 
+    browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
+        // Set the default URL to the current tab's hostname
+        urlField.value = new URL(tabs[0].url).hostname;
+    });
+
     // Update the displayed password length
     lengthSlider.addEventListener('input', () => {
         lengthValue.textContent = lengthSlider.value;
@@ -44,6 +49,9 @@ document.addEventListener('DOMContentLoaded', () => {
             browser.runtime.sendMessage({ action: 'addPassword', username: 'theo',
                 website: url, password: password }).then((response) => {
                 if (response.success) {
+                    browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
+                        browser.tabs.sendMessage(tabs[0].id, { action: 'inject', password: password });
+                    });
                     // close
                     window.close();
                     
@@ -57,11 +65,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-
-browser.runtime.onMessage.addListener((message) => {
-    console.log(message);
-    if(message.action === 'setURL') {
-        window.confirm("please confirm");
-        document.getElementById('url').value = message.url;
-    }
+window.addEventListener('unload', () => {
+    // Notify the background script that the popup is closed
+    browser.runtime.sendMessage({ action: 'closePopup' });
 });
+
