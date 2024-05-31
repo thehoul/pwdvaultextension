@@ -99,6 +99,7 @@ browser.menus.onClicked.addListener((info, tab) => {
     switch(info.menuItemId){
         case "updatepwd":
         case "vaultcreatepwd":
+            setState('passwordgen');
             browser.browserAction.openPopup();
             break;
         case "notauth":

@@ -119,11 +119,31 @@
       background: none;
     }
 
+    .side-by-side {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .icon-button {
+      width: auto;
+      background: none;
+      border: none;
+      color: #007bff;
+      font-size: 12px;
+      text-decoration: underline;
+      margin: 0;
+      padding: 0;
+      cursor: pointer;
+    }
+    .icon-button:hover {
+      background: none;
+    }
+
   </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-  <div id="login-container" class="container form-container active">
+  <div id="login-container" class="container form-container active" data-state="login">
     <h1>Login</h1>
     <form id="login-form">
       <label for="login-username">Username:</label>
@@ -136,7 +156,7 @@
     <div id="login-feedback" class="feedback"></div>
   </div>
 
-  <div id="signup-container" class="container form-container">
+  <div id="signup-container" class="container form-container" data-state="login">
     <h1>Sign Up</h1>
     <form id="signup-form">
       <label for="signup-username">Username:</label>
@@ -151,10 +171,13 @@
     <div id="signup-feedback" class="feedback"></div>
   </div>
 
-  <div id="pwdgen-container" class="container form-container">
+  <div id="pwdgen-container" class="container form-container" data-state="passwordgen">
     <button id="return" class="back-button"><i class="fa-solid fa-arrow-left"></i></button>
     <h1>Password Generator</h1>
-    <label for="url">Website URL:</label>
+    <div class="side-by-side">
+      <label for="url">Website URL:</label>
+      <button type="button" id="current-page-button" class="icon-button">current page</button>
+    </div>
     <input type="url" id="url" placeholder="Enter website URL" />
     <div class="slider-container">
         <label for="length">Password Length: <span id="lengthValue">12</span></label>
@@ -168,7 +191,7 @@
     <div id="error-message" class="error-message" style="display: none;">Error</div>
   </div>
 
-  <div id="account-container" class="container form-container">
+  <div id="account-container" class="container form-container" data-state="account">
     <div class="account-info">
       <h2>Logged in as <span id="account-username"></span></h2>
       <p>Email: <span id="account-email"></span></p>
@@ -183,5 +206,6 @@
   <script src="login.js"></script>
   <script src="popup.js"></script>
   <script src="passwordgen.js"></script>
+  <script src="communicator.js"></script>
 </body>
 </html>

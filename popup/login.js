@@ -1,19 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const loginContainer = document.getElementById('login-container');
-    const signupContainer = document.getElementById('signup-container');
-    const showSignupButton = document.getElementById('show-signup');
-    const showLoginButton = document.getElementById('show-login');
     const loginFeedback = document.getElementById('login-feedback');
     const signupFeedback = document.getElementById('signup-feedback');
 
     // Event listener to show the sign-up form
-    showSignupButton.addEventListener('click', () => {
+    document.getElementById('show-signup').addEventListener('click', () => {
         switchContainer('signup-container');
         loginFeedback.style.display = 'none';
     });
 
     // Event listener to show the login form
-    showLoginButton.addEventListener('click', () => {
+    document.getElementById('show-login').addEventListener('click', () => {
         switchContainer('login-container');
         signupFeedback.style.display = 'none';
     });
@@ -67,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    checkAuth();    
+    setPage(); 
 });
 
 function switchContainer(containerId){
@@ -75,6 +71,8 @@ function switchContainer(containerId){
         container.classList.remove('active');
     });
     document.getElementById(containerId).classList.add('active');
+    let state = document.getElementById(containerId).getAttribute('data-state');
+    browser.runtime.sendMessage({ action: 'setState', state });
 }
 
 function setUserDetails(username, email){
@@ -82,13 +80,35 @@ function setUserDetails(username, email){
     document.getElementById('account-email').textContent = email;
 }
 
+function setPage(){
+    checkAuth();
+    browser.runtime.sendMessage({ action: 'getState' }).then((response) => {
+        console.log('State: ' + response.state);    
+        let state = response.state;
+        switch(state){
+            case 'login':
+                switchContainer('login-container');
+                break;
+            case 'passwordgen':
+                switchContainer('pwdgen-container');
+                break;
+            case 'account':
+            default:
+                switchContainer('account-container');
+                break;
+        }
+    });
+}
+
 function checkAuth(){
     browser.runtime.sendMessage({ action: 'checkAuth' }).then((response) => {
-        if (response.success) {
-            switchContainer('account-container');
-            setUserDetails(response.username, response.email);
+        // Force the state to login if the user is not authenticated
+        if (!response.success) {
+            browser.runtime.sendMessage({ action: 'loggedOut'});
         } else {
-            switchContainer('login-container');
+            setUserDetails(response.username, response.email);
+            // Notify the state controller that the user is logged in
+            browser.runtime.sendMessage({ action: 'loggedIn'});
         }
     });
 }
