@@ -21,14 +21,8 @@ async function onStartup(){
  * Open the login page in a new tab when the extension is installed.
  */
 async function onInstalled(){
-  browser.tabs.create({
-    url: browser.runtime.getURL('login.html')
-  }).catch((error) => {
-    console.error('Error opening popup:', error);
-  });
+
 }
 
 browser.runtime.onStartup.addListener(onStartup);
 browser.runtime.onInstalled.addListener(onInstalled);
-
-

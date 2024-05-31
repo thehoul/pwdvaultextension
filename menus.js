@@ -98,13 +98,7 @@ function createNoPasswordMenu(base_url) {
 browser.menus.onClicked.addListener((info, tab) => {
     switch(info.menuItemId){
         case "updatepwd":
-            pwdUpdate = true;
-            browser.browserAction.setPopup({ popup: "passwordgen.html" });
-            browser.browserAction.openPopup();
-            break;
         case "vaultcreatepwd":
-            pwdUpdate = false;
-            browser.browserAction.setPopup({ popup: "passwordgen.html" });
             browser.browserAction.openPopup();
             break;
         case "notauth":

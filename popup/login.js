@@ -8,16 +8,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Event listener to show the sign-up form
     showSignupButton.addEventListener('click', () => {
-        loginContainer.classList.remove('active');
-        signupContainer.classList.add('active');
-        loginFeedback.style.display = 'none';  // Hide feedback when switching forms
+        switchContainer('signup-container');
+        loginFeedback.style.display = 'none';
     });
 
     // Event listener to show the login form
     showLoginButton.addEventListener('click', () => {
-        signupContainer.classList.remove('active');
-        loginContainer.classList.add('active');
-        signupFeedback.style.display = 'none';  // Hide feedback when switching forms
+        switchContainer('login-container');
+        signupFeedback.style.display = 'none';
     });
 
     // Handle login form submission
@@ -32,8 +30,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 loginFeedback.classList.add('success');
                 loginFeedback.style.display = 'block';
                 setTimeout(() => {
-                    window.close();
-                }, 1000);  // Close the popup after 1 second on successful login
+                    switchContainer('account-container');
+                    setUserDetails(response.username, response.email);
+                }, 100);  // Close the popup after 1 second on successful login
             } else {
                 loginFeedback.textContent = response.message;
                 loginFeedback.classList.remove('success');
@@ -57,9 +56,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 signupFeedback.classList.add('success');
                 signupFeedback.style.display = 'block';
                 setTimeout(() => {
-                    signupContainer.classList.remove('active');
-                    loginContainer.classList.add('active');
-                }, 1000);  // Switch to login form after 1 second on successful signup
+                    switchContainer('account-container');
+                    setUserDetails(response.username, response.email);
+                }, 100);  // Switch to login form after 1 second on successful signup
             } else {
                 signupFeedback.textContent = response.message;
                 signupFeedback.classList.remove('success');
@@ -67,4 +66,29 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    checkAuth();    
 });
+
+function switchContainer(containerId){
+    document.querySelectorAll('.container').forEach((container) => {
+        container.classList.remove('active');
+    });
+    document.getElementById(containerId).classList.add('active');
+}
+
+function setUserDetails(username, email){
+    document.getElementById('account-username').textContent = username;
+    document.getElementById('account-email').textContent = email;
+}
+
+function checkAuth(){
+    browser.runtime.sendMessage({ action: 'checkAuth' }).then((response) => {
+        if (response.success) {
+            switchContainer('account-container');
+            setUserDetails(response.username, response.email);
+        } else {
+            switchContainer('login-container');
+        }
+    });
+}

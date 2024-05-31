@@ -5,19 +5,19 @@
   <style>
     body {
       font-family: Arial, sans-serif;
+      margin: 0;
+      width: 270px;
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 100vh;
-      margin: 0;
-      background: #f7f7f7;
+      overflow: hidden;
+      background-color: #f7f7f7;
     }
     .container {
       background: #fff;
       padding: 20px;
       border-radius: 8px;
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      width: 300px;
       text-align: center;
     }
     h1 {
@@ -35,7 +35,7 @@
     input {
       width: 100%;
       padding: 10px;
-      margin-bottom: 15px;
+      margin-bottom: 10px;
       border: 1px solid #ddd;
       border-radius: 4px;
       box-sizing: border-box;
@@ -43,6 +43,7 @@
     button {
       width: 100%;
       padding: 10px;
+      margin-bottom: 5px;
       border: none;
       border-radius: 4px;
       background-color: #007bff;
@@ -50,6 +51,7 @@
       font-size: 16px;
       cursor: pointer;
       transition: background-color 0.3s;
+      box-sizing: border-box;
     }
     button:hover {
       background-color: #0056b3;
@@ -81,12 +83,44 @@
       background-color: green;
     }
     .form-container {
-      display: none;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.1s ease, visibility 0.1s ease;
+      position: absolute;
+    
     }
     .form-container.active {
-      display: block;
+      opacity: 1;
+      visibility: visible;
+      position: relative;
     }
+
+    .account-button {
+      padding: 7px;
+    }
+
+    .logout-message {
+      color: #000000;
+      font-size: 14px;
+    }
+
+    .back-button {
+      background: none;
+      border: none;
+      color: #000;
+      font-size: 16px;
+      cursor: pointer;
+      padding: 0px;
+      margin-bottom: 0px;
+      text-align: left;
+    }
+    .back-button:hover {
+      color: #0056b3;
+      background: none;
+    }
+
   </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
   <div id="login-container" class="container form-container active">
@@ -117,6 +151,37 @@
     <div id="signup-feedback" class="feedback"></div>
   </div>
 
+  <div id="pwdgen-container" class="container form-container">
+    <button id="return" class="back-button"><i class="fa-solid fa-arrow-left"></i></button>
+    <h1>Password Generator</h1>
+    <label for="url">Website URL:</label>
+    <input type="url" id="url" placeholder="Enter website URL" />
+    <div class="slider-container">
+        <label for="length">Password Length: <span id="lengthValue">12</span></label>
+        <input type="range" id="length" min="8" max="32" value="12">
+    </div>
+    <input type="text" id="password" />
+    <button id="generate">
+        <i class="fas fa-sync-alt"></i>
+    </button>
+    <button id="set">Create Password</button>
+    <div id="error-message" class="error-message" style="display: none;">Error</div>
+  </div>
+
+  <div id="account-container" class="container form-container">
+    <div class="account-info">
+      <h2>Logged in as <span id="account-username"></span></h2>
+      <p>Email: <span id="account-email"></span></p>
+    </div>
+    <button type="button" class="account-button" id="pwdmanage">Manage passwords</button>
+    <button type="button" class="account-button" id="pwdgenbtn">Password generator</button>
+    <button type="button" class="account-button" id="logout-button">Log out</button>
+    <div id="logout-message" class="logout-message" style="display: none;">Logging you out</div>
+  </div>
+
+
   <script src="login.js"></script>
+  <script src="popup.js"></script>
+  <script src="passwordgen.js"></script>
 </body>
 </html>

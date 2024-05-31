@@ -12,20 +12,20 @@ function generatePassword(length = 12) {
 document.addEventListener('DOMContentLoaded', () => {
     const passwordField = document.getElementById('password');
     const urlField = document.getElementById('url');
-    const generateButton = document.getElementById('generate');
-    const setButton = document.getElementById('set');
     const lengthSlider = document.getElementById('length');
     const lengthValue = document.getElementById('lengthValue');
 
-    // Display initial password
     function displayNewPassword() {
-        const newPassword = generatePassword(parseInt(lengthSlider.value, 10));
-        passwordField.value = newPassword;
+        passwordField.value = generatePassword(parseInt(lengthSlider.value, 10));
     }
 
     browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
         // Set the default URL to the current tab's hostname
-        urlField.value = new URL(tabs[0].url).hostname;
+        try {
+            urlField.value = new URL(tabs[0].url).hostname;
+        } catch (error) {
+            console.error('Error getting hostname:', error);
+        }
     });
 
     // Update the displayed password length
@@ -38,10 +38,14 @@ document.addEventListener('DOMContentLoaded', () => {
     displayNewPassword();
 
     // Regenerate password when the generate button is clicked
-    generateButton.addEventListener('click', displayNewPassword);
+    document.getElementById('generate').addEventListener('click', displayNewPassword);
+
+    document.getElementById('return').addEventListener('click', () => {
+        switchContainer('account-container');
+    });
 
     // Set the password for the specified URL when the set button is clicked
-    setButton.addEventListener('click', () => {
+    document.getElementById('set').addEventListener('click', () => {
         const url = urlField.value;
         const password = passwordField.value;
 
@@ -61,9 +65,3 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
-
-window.addEventListener('unload', () => {
-    // Notify the background script that the popup is closed
-    browser.runtime.sendMessage({ action: 'closePopup' });
-});
-

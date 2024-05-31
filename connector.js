@@ -27,7 +27,7 @@ function login(username, password) {
         })
     }).then((response) => {
         return response.json().then((data) => {
-            return { success: response.ok, message: data.msg };
+            return { success: response.ok, message: data.msg, username: data.username, email: data.email };
         }).catch((error) => {
             return { success: false, message: error };
         });
