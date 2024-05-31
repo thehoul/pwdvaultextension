@@ -4,8 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
         browser.runtime.sendMessage({ action: 'logout' }).then((response) => {
             if (response.success) {
                 setTimeout(() => {
-                    location.reload();
-                }, 500);
+                    switchContainer('login-container');
+                }, 1000);
             } else {
                 document.getElementById('logout-message').textContent = response.message;
             }
