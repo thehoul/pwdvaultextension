@@ -6,7 +6,7 @@
     "description": "This extension will help you to store your passwords securely",
 
     "background": {
-        "scripts": ["startup.js", "connector.js", "background.js", "menus.js"]
+        "scripts": ["startup.js", "connector.js", "background.js", "menus.js", "statecontroller.js"]
     },
 
     "permissions": [
