@@ -46,9 +46,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const password = passwordField.value;
 
         if (url) {
-            browser.runtime.sendMessage({ action: 'menuAddPassword', username: 'theo', 
+            browser.runtime.sendMessage({ action: 'menuAddPassword', 
                                         website: url, password: password }).then((response) => {
-                console.log(response);
                 if (response.success) {
                     // Close the popup
                     document.getElementById('error-message').style.display = 'none';

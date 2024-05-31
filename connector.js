@@ -1,7 +1,12 @@
-const USER_URL = 'https://pi.thehoul.ch/user/';
+const BASE_URL = 'https://pi.thehoul.ch';
+const LOGIN_URL = BASE_URL + '/login';
+const CREATE_USER_URL = BASE_URL + '/createUser';
+const GET_PWD_URL = BASE_URL + '/getPassword/';
+const SET_PWD_URL = BASE_URL + '/setPassword';
+const DEL_PWD_URL = BASE_URL + '/deletePassword';
+const UPDATE_PWD_URL = BASE_URL + '/updatePassword';
 const CHECK_AUTH_URL = 'https://pi.thehoul.ch/checkAuth';
 const LOGOUT_URL = 'https://pi.thehoul.ch/logout';
-const PASSWORD_URL = 'https://pi.thehoul.ch/passwords/';
 
 /**
  * Login to the server with the given username and password
@@ -11,12 +16,13 @@ const PASSWORD_URL = 'https://pi.thehoul.ch/passwords/';
  * will contain the response message.
  */
 function login(username, password) {
-    return fetch(USER_URL + username, {
+    return fetch(LOGIN_URL, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
+            "username": username,
             "password": password
         })
     }).then((response) => {
@@ -39,12 +45,14 @@ function login(username, password) {
  * will contain the response message.
  */
 function signup(username, password, email) {
-    return fetch(USER_URL + username, {
+    return fetch(CREATE_USER_URL, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
+            "username": username,
+            "email": email,
             "password": password
         })
     }).then((response) => {
@@ -72,7 +80,7 @@ function checkUserLoggedIn() {
         credentials: 'include'
     }).then((response) => {
         return response.json().then((data) => {
-            return { success: response.ok, user: data.user };
+            return { success: response.ok, username: data.username, email: data.email };
         });
     }).catch((error) => {
         return { success: false, message: error };
@@ -101,8 +109,8 @@ function logout() {
 
 }
 
-function getPassword(username, website) {
-    return fetch(PASSWORD_URL+username+'/'+website, {
+function getPassword(website) {
+    return fetch(GET_PWD_URL + website, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -110,39 +118,64 @@ function getPassword(username, website) {
         credentials: 'include'
     }).then((response) => {
         return response.json().then((data) => {
-            return { success: response.ok, passwords: data.passwords };
+            if(response.ok && data.accepted){
+                return { success: true, password: data.passwords };
+            } else {
+                return { success: false, message: data.msg };
+            }
         });
     }).catch((error) => {
         return { success: false, message: error };
     });
 }
 
-function addPassword(username, website, password) {
-    return fetch(PASSWORD_URL+username+'/'+website, {
+function setPassword(website, password) {
+    return fetch(SET_PWD_URL, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
+            "website": website,
             "password": password
         })
     }).then((response) => {
         return response.json().then((data) => {
-            return { success: response.ok, message: data.msg };
+            return { success: response.ok && data.accepted, message: data.msg };
         });
     }).catch((error) => {
         return { success: false, message: error };
     });
 }
 
-function deletePassword(username, website, password) {
-    return fetch(PASSWORD_URL+username+'/'+website, {
+function updatePassword(website, newPassword) {
+    return fetch(UPDATE_PWD_URL, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            "website": website,
+            "password": newPassword
+        })
+    }).then((response) => {
+        return response.json().then((data) => {
+            return { success: response.ok && data.accepted, message: data.msg };
+        });
+    }).catch((error) => {
+        return { success: false, message: error };
+    });
+}
+
+
+function deletePassword(website) {
+    return fetch(DEL_PWD_URL, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            "password": password
+            "website": website
         })
     }).then((response) => {
         return response.json().then((data) => {
@@ -159,7 +192,7 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
             sendResponse(login(message.username, message.password));
             break;
         case 'signup':
-            sendResponse(signup(message.username, message.password));
+            sendResponse(signup(message.username, message.password, message.email));
             break;
         case 'checkAuth':
             sendResponse(checkUserLoggedIn());
@@ -168,10 +201,13 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
             sendResponse(logout());
             break;
         case 'getPasswords':
-            sendResponse(getPassword(message.username, message.website));
+            sendResponse(getPassword(message.website));
+            break;
+        case 'updatePassword':
+            sendResponse(updatePassword(message.website, message.password));
             break;
         case 'addPassword':
-            sendResponse(addPassword(message.username, message.website, message.password));
+            sendResponse(setPassword(username, message.website, message.password));
             break;
         default:
             break;

@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 function checkUserLoggedIn() {
     return browser.runtime.sendMessage({ action: 'checkAuth' }).then((response) => {
         if (response.success) {
-            return { username: response.user, email: "dummy@email.ch" };
+            return { username: response.username, email: response.email };
         }
         return null;
     });

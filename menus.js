@@ -5,57 +5,40 @@
  */
 function createMenus(tab) {
     browser.menus.removeAll().then(() => {
-        let base_url;
         try {
             base_url = new URL(tab.url).hostname;
         } catch (e) {
-            browser.menus.create({
-                id: "no-website",
-                title: "PWDVault: unknown website",
-                type: "normal",
-                contexts: ["password"]
-            });
+            createNotWebsiteMenu();
             return;
         }
-
         checkUserLoggedIn().then((response) => {
             if(response.success){
-                getPassword("theo", base_url).then((response) => {
-                    if (response.success) {
-                        browser.menus.create({
-                            id: "passwords",
-                            title: "Passwords for " + base_url + ":",
-                            type: "normal",
-                            contexts: ["password"]
-                        });
-                        for (let i = 0; i < response.passwords.length; i++) {
-                            let pwd = response.passwords[i];
-                            pwds[i] = pwd;
-                            browser.menus.create({
-                                id: "vaultgetpwd" + i,
-                                title: pwd,
-                                contexts: ["password"]
-                            });
-                        }
-                    } else {
-                        browser.menus.create({
-                            id: "passwords",
-                            title: "No passwords for " + base_url,
-                            type: "normal",
-                            contexts: ["password"]
-                        })
-                    }
-                    createPasswordMenu();
+                getPassword(base_url).then((response) => {
+                    pwd = response.password;
+                    if (response.success)
+                        createPasswordMenu(base_url);
+                    else 
+                        createNoPasswordMenu(base_url);
                 });
             } else {
+                pwd = null;
                 createNotAuthMenu();
             }
         });
     });   
 }
 
-const MAX_PASSWORDS = 10;
-let pwds = new Array(MAX_PASSWORDS);
+let base_url;
+let pwd;
+
+function createNotWebsiteMenu(){
+    browser.menus.create({
+        id: "no-website",
+        title: "Unknown website",
+        type: "normal",
+        contexts: ["password"]
+    });
+}
 
 function createNotAuthMenu(){
     browser.menus.create({
@@ -66,10 +49,37 @@ function createNotAuthMenu(){
     });
 }
 
-/**
- * Create the menu options for creating a new password
- */
-function createPasswordMenu() {
+function createPasswordMenu(base_url){
+    browser.menus.create({
+        id: "password",
+        title: "use password for " + base_url,
+        type: "normal",
+        contexts: ["password"]
+    });
+    browser.menus.create({
+        id: "separator",
+        type: "separator",
+        contexts: ["password"]
+    });
+    browser.menus.create({
+        id: "deletepwd",
+        title: "Delete password",
+        contexts: ["password"]
+    });
+    browser.menus.create({
+        id: "updatepwd",
+        title: "Update Password",
+        contexts: ["password"]
+    });
+}
+
+function createNoPasswordMenu(base_url) {
+    browser.menus.create({
+        id: "nopassword",
+        title: "No passwords for " + base_url,
+        type: "normal",
+        contexts: ["password"]
+    })
     browser.menus.create({
         id: "separator",
         type: "separator",
@@ -80,46 +90,44 @@ function createPasswordMenu() {
         title: "Create Password",
         contexts: ["password"]
     });
-    
 }
 
 /**
  * Listen for clicks on the menu items and handle them
  */
 browser.menus.onClicked.addListener((info, tab) => {
-    if (info.menuItemId === "vaultcreatepwd") {
-        // Open the password generator page or a popup of something like that
-        browser.browserAction.setPopup({ popup: "passwordgen.html" });
-        browser.browserAction.openPopup();
-    } else if(info.menuItemId === "notauth"){ 
-        // Open the login page
-        browser.tabs.create({ url: "login.html" });
-    } else {
-        // Only handle the 10 first passwords
-        for(let i = 0; i < MAX_PASSWORDS; i++){
-            if (info.menuItemId === "vaultgetpwd" + i) {
-                let pwd = pwds[i];
-                let base_url = new URL(tab.url).hostname;
-
-
-                if(info.button == 0){ // left click
-                    browser.tabs.sendMessage(tab.id, { action: "inject", password: pwd});
-                } else if(info.button == 2){ // right click
-                    // Ask to confirm first
-                    browser.tabs.sendMessage(tab.id, { action: "confirm", message: "Are you sure you want to delete this password?"}).then((response) => {
-                        if(response.success){
-                            deletePassword("theo", base_url, pwd).then((response) => {
-                                if (response.success) {
-                                    createMenus(tab);
-                                } else {
-                                    console.log('Failed to delete password: ' + response.message);
-                                }
-                            });
+    switch(info.menuItemId){
+        case "updatepwd":
+            pwdUpdate = true;
+            browser.browserAction.setPopup({ popup: "passwordgen.html" });
+            browser.browserAction.openPopup();
+            break;
+        case "vaultcreatepwd":
+            pwdUpdate = false;
+            browser.browserAction.setPopup({ popup: "passwordgen.html" });
+            browser.browserAction.openPopup();
+            break;
+        case "notauth":
+            browser.tabs.create({ url: "login.html" });
+            break;
+        case "password":
+            browser.tabs.sendMessage(tab.id, { action: "inject", password: pwd});
+            break;
+        case "deletepwd":
+            browser.tabs.sendMessage(tab.id, { action: "confirm", message: "Are you sure you want to delete this password?"}).then((response) => {
+                if(response.success){
+                    deletePassword(base_url).then((response) => {
+                        if (response.success) {
+                            browser.tabs.sendMessage(tab.id, { action: "inject", password: "" });
+                            createMenus(tab);
+                        } else {
+                            console.log('Failed to delete password: ' + response.message);
                         }
                     });
-                }   
-            }
-        }
+                }
+            });
+            break;
+
     }
 });
 
@@ -136,17 +144,35 @@ browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     }
 });
 
+let pwdUpdate = false;
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     switch(message.action) {
         case 'menuAddPassword':
-            sendResponse(addPassword(message.username, message.website, message.password).then((response) => {
-                browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
-                    browser.tabs.sendMessage(tabs[0].id, { action: "inject", password: message.password });
-                    createMenus(tabs[0]);
-                });
-                return response;
-            }));
-
+            if(pwdUpdate){
+                sendResponse(updatePassword(base_url, message.password).then((response) => {
+                    if(response.success){
+                        browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
+                            browser.tabs.sendMessage(tabs[0].id, { action: "inject", password: message.password });
+                            createMenus(tabs[0]);
+                        });
+                    } else {
+                        console.log('Failed to update password: ' + response.message);
+                    }
+                    return response;
+                }));
+            } else {
+                sendResponse(setPassword(message.website, message.password).then((response) => {
+                    if(response.success){
+                        browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
+                            browser.tabs.sendMessage(tabs[0].id, { action: "inject", password: message.password });
+                            createMenus(tabs[0]);
+                        });
+                    } else {
+                        console.log('Failed to set password: ' + response.message);
+                    }
+                    return response;
+                }));
+            }      
             break;
     }
 });
