@@ -8,6 +8,16 @@ function generatePassword(length = 12) {
     return password;
 }
 
+function getCurrentHostname() {
+    try{
+        return browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
+            return new URL(tabs[0].url).hostname;
+        });
+    } catch (e) {
+        return '';
+    }
+}
+
 // Set up initial password
 document.addEventListener('DOMContentLoaded', () => {
     const passwordField = document.getElementById('password');
@@ -19,13 +29,9 @@ document.addEventListener('DOMContentLoaded', () => {
         passwordField.value = generatePassword(parseInt(lengthSlider.value, 10));
     }
 
-    browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
-        // Set the default URL to the current tab's hostname
-        try {
-            urlField.value = new URL(tabs[0].url).hostname;
-        } catch (error) {
-            console.error('Error getting hostname:', error);
-        }
+    // Set the default URL to the current tab's hostname
+    getCurrentHostname().then((hostname) => {
+        urlField.value = hostname;
     });
 
     // Update the displayed password length
@@ -42,6 +48,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('return').addEventListener('click', () => {
         switchContainer('account-container');
+    });
+
+    document.getElementById('current-page-button').addEventListener('click', () => {
+        getCurrentHostname().then((hostname) => {
+            urlField.value = hostname;
+        });
     });
 
     // Set the password for the specified URL when the set button is clicked
