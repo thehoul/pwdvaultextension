@@ -1,5 +1,14 @@
 // Current state of the extension
 let state = 'login';
+
+checkUserLoggedIn().then((response) => {    
+    if(response.success){
+        state = 'account';
+    } else {
+        state = 'login';
+    }
+});
+
 const states = ['login', 'account', 'passwordgen'];
 
 /**

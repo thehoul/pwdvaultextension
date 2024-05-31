@@ -83,7 +83,6 @@ function setUserDetails(username, email){
 function setPage(){
     checkAuth();
     browser.runtime.sendMessage({ action: 'getState' }).then((response) => {
-        console.log('State: ' + response.state);    
         let state = response.state;
         switch(state){
             case 'login':
