@@ -30,16 +30,13 @@ function setLoggedOut() {
 
 /**
  * Set the state of the extension to the specified state.
- * This triggers a runtime message 'newState' with the new state.
  * @param {string} newState 
  * @returns {string} The new state of the extension
  */
 function setState(newState) {
     if (states.includes(newState)) {
         state = newState;
-        console.log('State set to ' + newState);
     }
-    browser.runtime.sendMessage({ action: 'newState', state });
     return {state:state};
 }
 
