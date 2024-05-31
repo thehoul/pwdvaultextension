@@ -103,7 +103,8 @@ browser.menus.onClicked.addListener((info, tab) => {
             browser.browserAction.openPopup();
             break;
         case "notauth":
-            browser.tabs.create({ url: "login.html" });
+            setState('login');
+            browser.browserAction.openPopup();
             break;
         case "password":
             browser.tabs.sendMessage(tab.id, { action: "inject", password: pwd});

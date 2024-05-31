@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => {
                     switchContainer('account-container');
                     setUserDetails(response.username, response.email);
-                }, 100);  // Close the popup after 1 second on successful login
+                }, 500);  // Close the popup after 1 second on successful login
             } else {
                 loginFeedback.textContent = response.message;
                 loginFeedback.classList.remove('success');
@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => {
                     switchContainer('account-container');
                     setUserDetails(response.username, response.email);
-                }, 100);  // Switch to login form after 1 second on successful signup
+                }, 500);  // Switch to login form after 1 second on successful signup
             } else {
                 signupFeedback.textContent = response.message;
                 signupFeedback.classList.remove('success');
