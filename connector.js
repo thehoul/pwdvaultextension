@@ -1,13 +1,3 @@
-const BASE_URL = 'https://pi.thehoul.ch';
-const LOGIN_URL = BASE_URL + '/login';
-const CREATE_USER_URL = BASE_URL + '/createUser';
-const GET_PWD_URL = BASE_URL + '/getPassword/';
-const SET_PWD_URL = BASE_URL + '/setPassword';
-const DEL_PWD_URL = BASE_URL + '/deletePassword';
-const UPDATE_PWD_URL = BASE_URL + '/updatePassword';
-const CHECK_AUTH_URL = 'https://pi.thehoul.ch/checkAuth';
-const LOGOUT_URL = 'https://pi.thehoul.ch/logout';
-
 /**
  * Login to the server with the given username and password
  * @param {string} username 
@@ -16,17 +6,13 @@ const LOGOUT_URL = 'https://pi.thehoul.ch/logout';
  * will contain the response message.
  */
 function login(username, password) {
-    return fetch(LOGIN_URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            "username": username,
-            "password": password
-        })
+    console.log('Logging in');
+    return requestBody("POST", LOGIN_URL, { 
+        "username": username, 
+        "password": password 
     }).then((response) => {
         return response.json().then((data) => {
+            if(response.ok) setKey(password);
             return { success: response.ok, message: data.msg, username: data.username, email: data.email };
         }).catch((error) => {
             return { success: false, message: error };
@@ -45,18 +31,13 @@ function login(username, password) {
  * will contain the response message.
  */
 function signup(username, password, email) {
-    return fetch(CREATE_USER_URL, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            "username": username,
-            "email": email,
-            "password": password
-        })
+    return requestBody('PUT', CREATE_USER_URL, {
+        "username": username,
+        "email": email,
+        "password": password
     }).then((response) => {
         return response.json().then((data) => {
+            if(response.ok) setKey(password);
             return { success: response.ok, message: data.msg };
         }).catch((error) => {
             return { success: false, message: error };
@@ -72,13 +53,7 @@ function signup(username, password, email) {
  *  In case of success, the user object will contain the username.
  */
 function checkUserLoggedIn() {
-    return fetch(CHECK_AUTH_URL, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        credentials: 'include'
-    }).then((response) => {
+    return request('GET', CHECK_AUTH_URL).then((response) => {
         return response.json().then((data) => {
             return { success: response.ok, username: data.username, email: data.email };
         });
@@ -93,13 +68,7 @@ function checkUserLoggedIn() {
  * In both cases, the message contains the response message.
  */
 function logout() {
-    return fetch(LOGOUT_URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        credentials: 'include'
-    }).then((response) => {
+    return request('POST', LOGOUT_URL).then((response) => {
         return response.json().then((data) => {
             return { success: response.ok, message: data.msg };
         });
@@ -109,55 +78,32 @@ function logout() {
 
 }
 
-function getPassword(website) {
-    return fetch(GET_PWD_URL + website, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        credentials: 'include'
-    }).then((response) => {
-        return response.json().then((data) => {
-            if(response.ok && data.accepted){
-                return { success: true, password: data.passwords };
-            } else {
-                return { success: false, message: data.msg };
-            }
-        });
-    }).catch((error) => {
-        return { success: false, message: error };
-    });
+async function getPassword(website) {
+    let response = await request('GET', GET_PWD_URL + website);
+    let json = await response.json();
+    if(response.ok && json.accepted){
+        decPwd = await decryptPassword(json.password);
+        return { success: true, password: decPwd };
+    } else {
+        return { success: false, message: json.msg };
+    }
 }
 
-function setPassword(website, password) {
-    return fetch(SET_PWD_URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
+async function setPassword(website, password) {
+    encPwd = await encryptPassword(password);
+
+    let response = await requestBody('POST', SET_PWD_URL, {
             "website": website,
-            "password": password
-        })
-    }).then((response) => {
-        return response.json().then((data) => {
-            return { success: response.ok && data.accepted, message: data.msg };
-        });
-    }).catch((error) => {
-        return { success: false, message: error };
+            "password": encPwd
     });
+    let json = await response.json();
+    return { success: response.ok && json.accepted, message: json.msg };
 }
 
 function updatePassword(website, newPassword) {
-    return fetch(UPDATE_PWD_URL, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
+    return requestBody('PUT', UPDATE_PWD_URL, {
             "website": website,
             "password": newPassword
-        })
     }).then((response) => {
         return response.json().then((data) => {
             return { success: response.ok && data.accepted, message: data.msg };
@@ -169,14 +115,8 @@ function updatePassword(website, newPassword) {
 
 
 function deletePassword(website) {
-    return fetch(DEL_PWD_URL, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
+    return requestBody('DELETE', DEL_PWD_URL, {
             "website": website
-        })
     }).then((response) => {
         return response.json().then((data) => {
             return { success: response.ok, message: data.msg };
@@ -200,7 +140,7 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
         case 'logout':
             sendResponse(logout());
             break;
-        case 'getPasswords':
+        case 'getPassword':
             sendResponse(getPassword(message.website));
             break;
         case 'updatePassword':
