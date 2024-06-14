@@ -12,7 +12,7 @@
             "startup.js", 
             "background.js", 
             "menus.js", 
-            "connector.js",
+            "app/connector.js",
             "statecontroller.js", 
             "encryptor.js"]
     },
