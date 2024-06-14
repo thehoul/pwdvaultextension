@@ -51,14 +51,14 @@ function signup(username, password, email) {
  * @returns {Promise<{ success: boolean, user: string }>} success is true if user is logged in, false otherwise.
  *  In case of success, the user object will contain the username.
  */
-function checkUserLoggedIn() {
-    return request('GET', CHECK_AUTH_URL).then((response) => {
-        return response.json().then((data) => {
-            return { success: response.ok, username: data.username, email: data.email };
-        });
-    }).catch((error) => {
-        return { success: false, message: error };
-    });
+async function checkUserLoggedIn() {
+    try {
+        let response = await request('GET', CHECK_AUTH_URL);
+        let json = await response.json();
+        return { success: response.ok, username: json.username, email: json.email};
+    } catch(e){
+        return { success: false, message: e };
+    }
 }
 
 /**
