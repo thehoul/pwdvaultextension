@@ -6,7 +6,6 @@
  * will contain the response message.
  */
 function login(username, password) {
-    console.log('Logging in');
     return requestBody("POST", LOGIN_URL, { 
         "username": username, 
         "password": password 
