@@ -14,7 +14,7 @@
             "menus.js", 
             "app/connector.js",
             "statecontroller.js", 
-            "encryptor.js"]
+            "app/encryptor.js"]
     },
 
     "permissions": [
