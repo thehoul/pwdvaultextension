@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => {
                     switchContainer('account-container');
                     setUserDetails(response.username, response.email, response.acc_verified, response.tfa_enabled);
-                }, 500);  // Close the popup after 1 second on successful login
+                }, 500);
             } else {
                 loginFeedback.textContent = response.message;
                 loginFeedback.classList.remove('success');
@@ -52,9 +52,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 signupFeedback.classList.add('success');
                 signupFeedback.style.display = 'block';
                 setTimeout(() => {
-                    switchContainer('account-container');
+                    switchContainer('login-container');
                     setUserDetails(response.username, response.email, response.acc_verified, response.tfa_enabled);
-                }, 500);  // Switch to login form after 1 second on successful signup
+                }, 1000);  // Switch to login form after 1 second on successful signup
             } else {
                 signupFeedback.textContent = response.message;
                 signupFeedback.classList.remove('success');

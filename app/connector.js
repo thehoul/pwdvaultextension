@@ -12,7 +12,8 @@ function login(username, password) {
     }).then((response) => {
         return response.json().then((data) => {
             if(response.ok) setKey(password);
-            return { success: response.ok, message: data.msg, username: data.username, email: data.email };
+            data['success'] = response.ok;
+            return data;
         }).catch((error) => {
             return { success: false, message: error };
         });

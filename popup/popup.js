@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.success) {
                 setTimeout(() => {
                     switchContainer('login-container');
+                    document.getElementById('logout-message').style.display = 'none';
                 }, 1000);
             } else {
                 document.getElementById('logout-message').textContent = response.message;
