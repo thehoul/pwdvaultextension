@@ -1,0 +1,148 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    width: 270px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background-color: #f7f7f7;
+  }
+  .container {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    text-align: center;
+  }
+  h1 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+  }
+  label {
+    display: block;
+    text-align: left;
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #555;
+  }
+  input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+  button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 5px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    box-sizing: border-box;
+  }
+  button:hover {
+    background-color: #0056b3;
+  }
+
+  button:disabled{
+    background-color: #007bff9d;
+    cursor: not-allowed;
+  }
+
+  .toggle-button {
+    background: none;
+    color: #007bff;
+    border: none;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 10px;
+  }
+  .toggle-button:hover {
+    color: white;
+    background-color: #0056b3;
+  }
+  .feedback {
+    border-radius: 4px;
+    padding: 10px;
+    display: none;
+    margin-top: 10px;
+    font-size: 14px;
+    color: white;
+    background-color: red;
+  }
+  .feedback.success {
+    color: white;
+    background-color: green;
+  }
+  .form-container {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.1s ease, visibility 0.1s ease;
+    position: absolute;
+  
+  }
+  .form-container.active {
+    opacity: 1;
+    visibility: visible;
+    position: relative;
+  }
+
+  .account-button {
+    padding: 7px;
+  }
+
+  .logout-message {
+    color: #000000;
+    font-size: 14px;
+  }
+
+  .back-button {
+    background: none;
+    border: none;
+    color: #000;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0px;
+    margin-bottom: 0px;
+    text-align: left;
+  }
+  .back-button:hover {
+    color: #0056b3;
+    background: none;
+  }
+
+  .side-by-side {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .icon-button {
+    width: auto;
+    background: none;
+    border: none;
+    color: #007bff;
+    font-size: 12px;
+    text-decoration: underline;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+  }
+  .icon-button:hover {
+    background: none;
+  }
+  .qr-code-image {
+    width: 50%;
+    max-width: 100px;
+    height: auto;
+    display: none;
+    margin: 0 auto;
+  }

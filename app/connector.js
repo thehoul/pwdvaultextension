@@ -133,6 +133,14 @@ function enable2fa() {
     });
 }
 
+function sendAccountVerify() {
+    return request('GET', SEND_ACCOUNT_VERIFY_URL).then((response) => {
+        return response.json().then((data) => {
+            return { success: response.ok, message: data.msg };
+        });
+    });
+}
+
 function deletePassword(website) {
     return requestBody('DELETE', DEL_PWD_URL, {
             "website": website
@@ -170,6 +178,9 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
             break;
         case 'enable2fa':
             sendResponse(enable2fa());
+            break;
+        case 'sendAccountVerify':
+            sendResponse(sendAccountVerify());
             break;
         default:
             break;

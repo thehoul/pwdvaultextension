@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
         switchContainer('pwdgen-container');
     });
     document.getElementById('pwdmanage').addEventListener('click', () => {
-        // TODO 
+        // TODO
     });
 
     document.getElementById('enable-2fa').addEventListener('click', () => {
@@ -30,10 +30,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('qr-code-image').style.display = 'none';
                 document.getElementById('error-message_qrcode').style.display = 'block';
                 document.getElementById('error-message_qrcode').textContent = "Error: " + response.message;
-                // TODO show error message
             }
         });
-        // TODO request the qrcode (/2faActivate) 
-        // and show the qrcode in a dialog with a input field for the code and submit and return button
+    });
+
+    let accountFeedback = document.getElementById('account-feedback');
+    document.getElementById('verification-button').addEventListener('click', () => {
+        browser.runtime.sendMessage({ action: 'sendAccountVerify'}).then((response) => {
+            if(response.success) {
+                accountFeedback.textContent = response.message;
+                accountFeedback.classList.add('success');
+                accountFeedback.style.display = 'block';
+            } else {
+                accountFeedback.textContent = response.message;
+                accountFeedback.classList.remove('success');
+                accountFeedback.style.display = 'block';
+            }
+            setTimeout(() => {
+                accountFeedback.style.display = 'none';
+            }, 5000);
+        });
+    });
+
+    document.querySelectorAll('.back-button').forEach((container) => {
+        container.addEventListener('click', () => {
+            switchContainer('account-container');
+        });
     });
 });
