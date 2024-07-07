@@ -79,13 +79,14 @@ function setUserDetails(username, email, verified, tfaEnabled){
     document.getElementById('account-username').textContent = username;
     document.getElementById('account-email').textContent = email;
 
-    document.getElementById('verification-button').disabled = true;
-
-
+    
+    
     if (verified){
         document.getElementById('verified-yes').style.display = 'inline';
+        document.getElementById('verification-button').disabled = true;
     } else {
         document.getElementById('verified-no').style.display = 'inline';
+        document.getElementById('verification-button').disabled = false;
     }
 
     if (tfaEnabled){
