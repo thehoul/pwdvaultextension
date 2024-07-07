@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 loginFeedback.style.display = 'block';
                 setTimeout(() => {
                     switchContainer('account-container');
-                    setUserDetails(response.username, response.email);
+                    setUserDetails(response.username, response.email, response.acc_verified, response.tfa_enabled);
                 }, 500);  // Close the popup after 1 second on successful login
             } else {
                 loginFeedback.textContent = response.message;
@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 signupFeedback.style.display = 'block';
                 setTimeout(() => {
                     switchContainer('account-container');
-                    setUserDetails(response.username, response.email);
+                    setUserDetails(response.username, response.email, response.acc_verified, response.tfa_enabled);
                 }, 500);  // Switch to login form after 1 second on successful signup
             } else {
                 signupFeedback.textContent = response.message;
@@ -75,9 +75,21 @@ function switchContainer(containerId){
     browser.runtime.sendMessage({ action: 'setState', state });
 }
 
-function setUserDetails(username, email){
+function setUserDetails(username, email, verified, tfaEnabled){
     document.getElementById('account-username').textContent = username;
     document.getElementById('account-email').textContent = email;
+
+    if (verified){
+        document.getElementById('verified-yes').style.display = 'inline';
+    } else {
+        document.getElementById('verified-no').style.display = 'inline';
+    }
+
+    if (tfaEnabled){
+        document.getElementById('2fa-yes').style.display = 'inline';
+    } else {
+        document.getElementById('2fa-no').style.display = 'inline';
+    }
 }
 
 function setPage(){
@@ -105,7 +117,7 @@ function checkAuth(){
         if (!response.success) {
             browser.runtime.sendMessage({ action: 'loggedOut'});
         } else {
-            setUserDetails(response.username, response.email);
+            setUserDetails(response.username, response.email, response.acc_verified, response.tfa_enabled);
             // Notify the state controller that the user is logged in
             browser.runtime.sendMessage({ action: 'loggedIn'});
         }

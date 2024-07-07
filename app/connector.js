@@ -55,7 +55,8 @@ async function checkUserLoggedIn() {
     try {
         let response = await request('GET', CHECK_AUTH_URL);
         let json = await response.json();
-        return { success: response.ok, username: json.username, email: json.email};
+        json['success'] = response.ok;
+        return json;
     } catch(e){
         return { success: false, message: e };
     }
@@ -112,6 +113,24 @@ function updatePassword(website, newPassword) {
     });
 }
 
+function enable2fa() {
+    return request('GET', ENABLE_2FA_URL).then((response) => {
+        if(response.ok)
+            return response.blob().then((blob) => {
+                url = URL.createObjectURL(blob);
+                console.log(url);
+                return { success: true, qrCode: URL.createObjectURL(blob) };
+            });
+        else {
+            return response.json().then((data) => {
+                console.log(data);
+                return { success: false, message: data.message };
+            });
+        }
+    }).catch((error) => {
+        return { success: false, message: error };
+    });
+}
 
 function deletePassword(website) {
     return requestBody('DELETE', DEL_PWD_URL, {
@@ -147,6 +166,9 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
             break;
         case 'addPassword':
             sendResponse(setPassword(username, message.website, message.password));
+            break;
+        case 'enable2fa':
+            sendResponse(enable2fa());
             break;
         default:
             break;

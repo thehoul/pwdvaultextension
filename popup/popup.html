@@ -138,6 +138,13 @@
     .icon-button:hover {
       background: none;
     }
+    .qr-code-image {
+      width: 50%;
+      max-width: 100px;
+      height: auto;
+      display: none;
+      margin: 0 auto;
+    }
 
   </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -171,6 +178,14 @@
     <div id="signup-feedback" class="feedback"></div>
   </div>
 
+  <div id="qrcode-container" class="container form-container" data-state="passwordgen">
+    <button id="return" class="back-button"><i class="fa-solid fa-arrow-left"></i></button>
+    <h1>2FA QR code</h1>
+    <p>Scan this QR code with your authenticator app</p>
+    <img id="qr-code-image" src="" alt="QR Code" width="100%", height="auto">
+    <div id="error-message_qrcode" class="feedback" style="display: none;">Error</div>
+  </div>
+
   <div id="pwdgen-container" class="container form-container" data-state="passwordgen">
     <button id="return" class="back-button"><i class="fa-solid fa-arrow-left"></i></button>
     <h1>Password Generator</h1>
@@ -195,6 +210,19 @@
     <div class="account-info">
       <h2>Logged in as <span id="account-username"></span></h2>
       <p>Email: <span id="account-email"></span></p>
+      <p>
+        Verified 
+        <span id="account-verified" class="status-icon">
+            <i class="fas fa-check-circle" style="color: green; display: none;" id="verified-yes"></i>
+            <i class="fas fa-times-circle" style="color: red; display: none;" id="verified-no"></i>
+        </span>
+        &nbsp;|&nbsp;
+        2FA 
+        <span id="2fa-enabled" class="status-icon">
+            <i class="fas fa-check-circle" style="color: green; display: none;" id="2fa-yes"></i>
+            <i class="fas fa-times-circle" style="color: red; display: none;" id="2fa-no"></i>
+        </span>
+    </p>
     </div>
     <button type="button" class="account-button" id="pwdmanage">Manage passwords</button>
     <button type="button" class="account-button" id="pwdgenbtn">Password generator</button>

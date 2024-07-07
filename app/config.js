@@ -6,4 +6,5 @@ const SET_PWD_URL = BASE_URL + '/setPassword';
 const DEL_PWD_URL = BASE_URL + '/deletePassword';
 const UPDATE_PWD_URL = BASE_URL + '/updatePassword';
 const CHECK_AUTH_URL = BASE_URL + '/checkAuth';
+const ENABLE_2FA_URL = BASE_URL + '/2faActivate';
 const LOGOUT_URL = BASE_URL + '/logout';
